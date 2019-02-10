@@ -10,19 +10,16 @@
 //
 
 #include <sudoSolvUtils.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 
 
-size_t xlatRowCol(int row, int col)
+size_t xlatRowCol(int row, int col, int degree)
 {
     if(row >= 0 &&
-            row < PDEGREE &&
+            row < degree &&
             col >= 0 &&
-            col < PDEGREE)
+            col < degree)
     {
-        return(col*sizeof(Cell)*PDEGREE + row*sizeof(Cell));
+        return(col*sizeof(Cell)*degree + row*sizeof(Cell));
     }
     return(-1);
 }
@@ -30,7 +27,7 @@ size_t xlatRowCol(int row, int col)
 
 int setCell(Puzzle *p, int row, int col, Cell v)
 {
-    size_t pos = xlatRowCol(row, col);
+    size_t pos = xlatRowCol(row, col, p->degree);
     if(pos >= 0)
         p->cell[pos] = v;
     else
@@ -40,29 +37,49 @@ int setCell(Puzzle *p, int row, int col, Cell v)
 
 Cell getCell(Puzzle *p, int row, int col)
 {
-    size_t pos = xlatRowCol(row, col);
+    size_t pos = xlatRowCol(row, col, p->degree);
     if(pos >= 0)
-        return(p->cell[xlatRowCol(row,col)]);
+        return(p->cell[xlatRowCol(row,col, p->degree)]);
     else
         return(pos);
 }
 
 
-int loadPuzzle(char *filename, Puzzle * p)
+Puzzle * loadPuzzle(char *filename)
 {
-    printf("Loading input file: %s\n", filename);
+    int row, col, v;
+    int c;
+    int degree;
+    int count = 0;
+    Puzzle *p;
     FILE *ifp;
+
+    printf("Loading input file: %s\n", filename);
     ifp = fopen(filename,"r");
+
 
 
     if(ifp == NULL) {
         printf("ERROR: Unable to open file: %s\n", filename);
-        return(-1);
+        return(NULL);
     }
 
-    int row, col, v;
-    int c;
-    int count = 0;
+    // First line of the puzzle file should be a single integer that is the puzzle degree
+    if((c = fscanf(ifp, "%d\n", &degree)) != 1)
+    {
+        printf("Invalid puzzle file.\n");
+        return(NULL);
+    }
+    
+    if(degree < 2 || degree > 9) {
+        printf("Invalid puzzle degree of %d. The degree must be between 2 and 9.\n", degree);
+        return(NULL);
+    }
+
+    p = (Puzzle *)malloc(sizeof(Puzzle));
+    p->cell = (Cell *)malloc(sizeof(Cell)*degree*degree);
+    p->degree = degree;
+
     while(ifp)
     {
         if((c = fscanf(ifp, "%d,%d,%d\n", &row, &col, &v)) != 3)
@@ -71,19 +88,23 @@ int loadPuzzle(char *filename, Puzzle * p)
         }
         else 
         {
+            if(row > degree || col > degree) {
+                printf("Bad cell coordinates: (%d, %d)\nExitting.\n", row, col);
+                return(NULL);
+            }
             count += c/3;
             setCell(p, row, col, v);
         }
     }
-    return(count);
+    return(p);
 
 }
 
 int printPuzzle(Puzzle *p)
 {
     Cell cv;
-    for(int row = 0; row < PDEGREE; row++) {
-        for(int col = 0; col < PDEGREE; col++) {
+    for(int row = 0; row < p->degree; row++) {
+        for(int col = 0; col < p->degree; col++) {
             cv = getCell(p, row, col);
             ((int)cv == 0) ? printf(" - ") : printf(" %d ", (int)cv);
         }
@@ -92,32 +113,22 @@ int printPuzzle(Puzzle *p)
     return(0);
 }
 
-int initPuzzle(Puzzle *p)
+int getBlockRow(int row, int degree)
 {
-    for(int row = 0; row < PDEGREE; row++) {
-        for(int col = 0; col < PDEGREE; col++) {
-            setCell(p, row, col, (Cell)0);
-        }
-    }
-    return(0);
+    return(row % (int)sqrt(degree));
 }
 
-int getBlockRow(int x)
+int getBlockCol(int col, int degree)
 {
-    return(x % (int)sqrt(PDEGREE));
+    return(col % (int)sqrt(degree));
 }
 
-int getBlockCol(int y)
+int checkPuzzleCol(Puzzle * p, int col)
 {
-    return(y % (int)sqrt(PDEGREE));
-}
-
-int checkPuzzleRow(Puzzle * p, int x)
-{
-    for(int y = 0; y < PDEGREE-1; y++) {
-        for(int j = y+1; j < PDEGREE; j++) {
-            if(getCell(p, x, y) == getCell(p, x, j) && getCell(p, x, y) != 0) {
-                printf("Row Error at (%d, %d) and (%d, %d)\n", x, y, x, j);
+    for(int row1 = 0; row1 < p->degree-1; row1++) {
+        for(int row2 = row1+1; row2 < p->degree; row2++) {
+            if(getCell(p, row1, col) == getCell(p, row2, col) && getCell(p, row1, col) != 0) {
+                printf("Column Error at (%d, %d) and (%d, %d)\n", row1, col, row2, col);
                 return(-1);
             }
         }
@@ -125,12 +136,12 @@ int checkPuzzleRow(Puzzle * p, int x)
     return(1);
 }
 
-int checkPuzzleCol(Puzzle * p, int y)
+int checkPuzzleRow(Puzzle * p, int row)
 {
-    for(int x = 0; x < PDEGREE-1; x++) {
-        for(int i = x+1; i < PDEGREE; i++) {
-            if(getCell(p, x, y) == getCell(p, i, y) && getCell(p, x, y) != 0) {
-                printf("Column Error at (%d, %d) and (%d, %d)\n", x, y, i, y);
+    for(int col1 = 0; col1 < p->degree-1; col1++) {
+        for(int col2 = col1+1; col2 < p->degree; col2++) {
+            if(getCell(p, row, col1) == getCell(p, row, col2) && getCell(p, row, col1) != 0) {
+                printf("Row Error at (%d, %d) and (%d, %d)\n", row, col1, row, col2);
                 return(-1);
             }
         }
@@ -140,17 +151,16 @@ int checkPuzzleCol(Puzzle * p, int y)
 
 int checkPuzzleBlock(Puzzle *p, int k, int l) 
 {
-    int deg_sqrt = sqrt(PDEGREE);
-    for(int i = k*deg_sqrt; i < (k+1)*deg_sqrt; i++) {
-        for(int j = l*deg_sqrt; j < (l+1)*deg_sqrt; j++) {
-
-            for(int x = k*deg_sqrt; x < (k+1)*deg_sqrt; x++) {
-                for(int y = l*deg_sqrt; y < (l+1)*deg_sqrt; y++) {
-                    if(((i != x) || (j != y)) && getCell(p, x, y) == getCell(p, i, j) && getCell(p, x, y != 0)) {
-                        printf("Subblock Error at (%d, %d) and (%d, %d)\n", i, j, x, y);
-                        return (-1);
-                    }
-                }
+    int deg_sqrt = (int)sqrt(p->degree);
+    for(int c1 = 0; c1 < p->degree-1; c1++) {
+        int col1 = k*deg_sqrt + (c1 % deg_sqrt);
+        int row1 = l*deg_sqrt + (c1 / deg_sqrt);
+        for(int c2 = c1+1; c2 < p->degree; c2++) {
+            int col2 = k*deg_sqrt + (c2 % deg_sqrt);
+            int row2 = l*deg_sqrt + (c2 / deg_sqrt);
+            if(getCell(p, row1, col1) == getCell(p, row2, col2) && getCell(p, row1, col1) != 0) {
+                printf("Subblock Error at (%d, %d) and (%d, %d)\n", row1, col1, row2, col2);
+                return (-1);
             }
         }
     }
@@ -164,22 +174,22 @@ int verifyPuzzle(Puzzle * p)
     // For all rows
     // For all columns 0 to PDEGREE-1
     // For all columns  
-    for(int x = 0; x < PDEGREE; x++) {
-        if(checkPuzzleRow(p, x) < 0) return(-1);
+    for(int row = 0; row < p->degree; row++) {
+        if(checkPuzzleRow(p, row) < 0) return(-1);
     }
 
     // Check columns
     // For all columns
-    // For all rows 0 to PDEGREE-1
+    // For all rows 0 to degree-1
     // For all rows  
-    for(int y = 0; y < PDEGREE; y++) {
-        if(checkPuzzleCol(p, y) < 0) return(-1);
+    for(int col = 0; col < p->degree; col++) {
+        if(checkPuzzleCol(p, col) < 0) return(-1);
     }
 
     // Check subblocks
     // Need to optimize this.
     // Loop for each subblock - there are PDEGREE subblocks
-    int deg_sqrt = sqrt(PDEGREE);
+    int deg_sqrt = sqrt(p->degree);
     for(int k = 0; k < deg_sqrt; k++) {
         for(int l = 0; l < deg_sqrt; l++) {
             if(checkPuzzleBlock(p, k, l) < 0) return(-1);

@@ -10,15 +10,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sudoSolvUtils.h>
 #include <string.h>
+
+#include <sudoSolvUtils.h>
+#include <sudoSolvers.h>
 
 int main(int argc, char **argv)
 {
-	Puzzle *p;
-    p = (Puzzle *)malloc(sizeof(Puzzle));
-    char defFile[] = "test/test.pz";
+    Puzzle *p;
+
+    const char *defFile = "test/test.pz";
     char *inFile;
+
     if(argc > 1)
     {
         inFile = (char*)malloc(sizeof(char)*(strlen(argv[1])+1));
@@ -29,15 +32,25 @@ int main(int argc, char **argv)
         inFile = (char*)malloc(sizeof(char)*(strlen(defFile)+1));
         strncpy(inFile,defFile,strlen(defFile)+1);
     }
-        printf("Input file: %s\n", inFile);
 
-    initPuzzle(p);
-    printPuzzle(p);
+    printf("Input file: %s\n", inFile);
 
     printf("Loading puzzle\n");
-    printf("Loaded %d values\n", loadPuzzle(inFile,p));
+    p = loadPuzzle(inFile);
+    if (p == NULL) {
+        printf("Error loading puzzle. Exitting.\n");
+    }
 
-    printf("Printing puzzle\n");
+    printf("Printing start puzzle\n");
+    printPuzzle(p);
+
+    if(treeSolve(p)) {
+        printf("The puzzle is solved\n");
+    }
+    else {
+        printf("Unable to solve the puzzle.\n");
+    }
+
     printPuzzle(p);
 
     if(verifyPuzzle(p) > 0) 

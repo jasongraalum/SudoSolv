@@ -13,7 +13,7 @@ LIBS= -lm
 _DEPS = sudoSolvUtils.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = sudoSolv.o sudoSolvUtils.o
+_OBJ = sudoSolv.o sudoSolvUtils.o sudoSolvers.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
