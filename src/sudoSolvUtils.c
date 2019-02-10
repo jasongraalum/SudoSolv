@@ -29,7 +29,10 @@ int setCell(Puzzle *p, int row, int col, Cell v)
 {
     size_t pos = xlatRowCol(row, col, p->degree);
     if(pos >= 0)
+    {
         p->cell[pos] = v;
+        p->setCount++;
+    }
     else
         return(-1);
     return(1);
@@ -39,7 +42,10 @@ Cell getCell(Puzzle *p, int row, int col)
 {
     size_t pos = xlatRowCol(row, col, p->degree);
     if(pos >= 0)
+    {
+        p->getCount++;
         return(p->cell[xlatRowCol(row,col, p->degree)]);
+    }
     else
         return(pos);
 }
@@ -79,6 +85,8 @@ Puzzle * loadPuzzle(char *filename)
     p = (Puzzle *)malloc(sizeof(Puzzle));
     p->cell = (Cell *)malloc(sizeof(Cell)*degree*degree);
     p->degree = degree;
+    p->setCount = count;
+    p->getCount = count;
 
     while(ifp)
     {
@@ -98,6 +106,26 @@ Puzzle * loadPuzzle(char *filename)
     }
     return(p);
 
+}
+
+Puzzle * fillPuzzle(int val, int degree)
+{
+    int row, col, v;
+    int c;
+    Puzzle *p;
+
+    p = (Puzzle *)malloc(sizeof(Puzzle));
+    p->cell = (Cell *)malloc(sizeof(Cell)*degree*degree);
+    p->degree = degree;
+    p->setCount = 0;
+    p->getCount = 0;
+
+    for(int row = 0; row < degree; row++) {
+        for(int col = 0; col < degree; col++) {
+            setCell(p, row, col, val);
+        }
+    }
+    return(p);
 }
 
 int printPuzzle(Puzzle *p)

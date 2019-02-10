@@ -45,10 +45,10 @@ int main(int argc, char **argv)
     printPuzzle(p);
 
     if(treeSolve(p)) {
-        printf("The puzzle is solved\n");
+        printf("The puzzle was solved in %d sets and %d gets.\n", p->setCount, p->getCount);
     }
     else {
-        printf("Unable to solve the puzzle.\n");
+        printf("Unable to solve the puzzle after %d sets and %d gets.\n", p->setCount, p->getCount);
     }
 
     printPuzzle(p);
@@ -58,6 +58,8 @@ int main(int argc, char **argv)
     else
         printf("Puzzle solution is invalid.\n");
 
+    free(p);
 	return 0;
+    
 }
 

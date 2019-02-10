@@ -64,3 +64,23 @@ int addGuess(Puzzle * p, int x, int y)
     } while(1);
 }
 
+/*
+// Eliminate Solver int elimSolver(Puzzle * p)
+{
+    Puzzle ** elimPs;
+    elimPs = malloc(sizeof(Puzzle*)*p->degree);
+    // Build "degree"  puzzles which represent the availability of each number
+    for(int degree = 0; degree < p->degree; degree++) {
+        elimPs[degree] = fillPuzzle(degree+1,p->degree);
+    }
+
+    int updates = updateElimPs(p, elimPs);
+
+    return(1);
+}
+
+int updateEmilPs(Puzzle *p, Puzzle ** ePs)
+{
+    for(int degree = 0; degree < p->degree; 
+
+*/
