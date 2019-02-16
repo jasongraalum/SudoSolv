@@ -13,14 +13,14 @@
 
 int treeSolve(Puzzle * p)
 {
-    printPuzzle(p);
+    //printPuzzle(p);
     return(addGuess(p, 0, 0));
 }
 
 int addGuess(Puzzle * p, int x, int y)
 {
-    printPuzzle(p);
-    printf("\n\n\n");
+    //printPuzzle(p);
+    //printf("\n\n\n");
     //printf("\nChecking %d, %d\t", x, y);
 
     // If cell already has a value
