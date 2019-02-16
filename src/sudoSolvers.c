@@ -18,11 +18,13 @@ int treeSolve(Puzzle * p)
 
 int addGuess(Puzzle * p, int x, int y)
 {
-    printf("Checking %d, %d\t", x, y);
+    printPuzzle(p);
+    printf("\n\n\n");
+    //printf("\nChecking %d, %d\t", x, y);
 
     // If cell already has a value
     if(getCell(p, x, y) != 0) {
-        printf("set value : %d\n", getCell(p, x, y));
+//        printf("set value : %d\n", getCell(p, x, y));
         int new_x, new_y;
         new_x = (x + 1) % p->degree;
         new_y = new_x == 0 ? (y + 1) : y;
@@ -37,8 +39,9 @@ int addGuess(Puzzle * p, int x, int y)
 
     Cell guess_val = 1;
     do {
-        printf("Trying %d at %d, %d\n", guess_val, x, y);
+//        printf("Trying %d at %d, %d\n", guess_val, x, y);
         // Try a number
+      //  printf("(%d, %d) %d ", x, y, guess_val);
         setCell(p, x, y, guess_val);
 
         // If valid, increment cell indexes and call addGuess
@@ -55,32 +58,32 @@ int addGuess(Puzzle * p, int x, int y)
             if(addGuess(p, new_x, new_y) > 0) 
                 return(1);
         }
-        printf("Incrementing guess\n");
+//        printf("Incrementing guess\n");
         guess_val++;
         if(guess_val > p->degree) { 
+     //       printf("(%d, %d) %d ", x, y, guess_val);
             setCell(p, x, y, 0);
             return(-1);
         }
     } while(1);
 }
 
-/*
-// Eliminate Solver int elimSolver(Puzzle * p)
+int elimSolver(Puzzle * p)
 {
-    Puzzle ** elimPs;
-    elimPs = malloc(sizeof(Puzzle*)*p->degree);
-    // Build "degree"  puzzles which represent the availability of each number
-    for(int degree = 0; degree < p->degree; degree++) {
-        elimPs[degree] = fillPuzzle(degree+1,p->degree);
+    // Need to fill empty cells with available numbers.
+    for(int row = 0; row < degree; row++) {
+        for(int col = 0; col < degree; col++) {
+            if(getCell(p, row, col) == 0) {
+                size_t pos = xlatRowCol(row, col, p->degree);
+            }
+        }
     }
-
-    int updates = updateElimPs(p, elimPs);
 
     return(1);
 }
 
 int updateEmilPs(Puzzle *p, Puzzle ** ePs)
 {
-    for(int degree = 0; degree < p->degree; 
+    return(0);
+}
 
-*/

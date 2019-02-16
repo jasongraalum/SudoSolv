@@ -20,28 +20,31 @@
 
 // Each cell can have degree + 1 values - the +1 is for unknown.
 // To simplify - will optimize memory later
-typedef int Cell;
+typedef char Cell;
 
 // Replace cell with int for now - optimize memory later
 typedef struct Puzzle {
         int degree;
         int setCount;
         int getCount;
-	Cell *cell;
+	Cell **cell;
 } Puzzle;
 
 size_t xlatRowCol(int, int, int);
 int setCell(Puzzle *, int, int, Cell);
 Cell getCell(Puzzle *, int, int);
+
 Puzzle * loadPuzzle(char *);
-Puzzle * fillPuzzle(int, int);
+
 int printPuzzle(Puzzle *);
+
 int getBlockRow(int, int);
 int getBlockCol(int, int);
+
 int checkPuzzleRow(Puzzle *, int);
 int checkPuzzleCol(Puzzle *, int);
 int checkPuzzleBlock(Puzzle *, int, int);
-int verifyPuzzle(Puzzle *);
 
+int verifyPuzzle(Puzzle *);
 
 #endif

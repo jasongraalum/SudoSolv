@@ -20,23 +20,23 @@ int main(int argc, char **argv)
     Puzzle *p;
 
     const char *defFile = "test/test.pz";
-    char *inFile;
+    char *inFilename;
 
     if(argc > 1)
     {
-        inFile = (char*)malloc(sizeof(char)*(strlen(argv[1])+1));
-        strncpy(inFile,argv[1],strlen(argv[1])+1);
+        inFilename = (char*)malloc(sizeof(char)*(strlen(argv[1])+1));
+        strncpy(inFilename,argv[1],strlen(argv[1])+1);
     }
     else
     {
-        inFile = (char*)malloc(sizeof(char)*(strlen(defFile)+1));
-        strncpy(inFile,defFile,strlen(defFile)+1);
+        inFilename = (char*)malloc(sizeof(char)*(strlen(defFile)+1));
+        strncpy(inFilename,defFile,strlen(defFile)+1);
     }
 
-    printf("Input file: %s\n", inFile);
+    printf("Input file: %s\n", inFilename);
 
     printf("Loading puzzle\n");
-    p = loadPuzzle(inFile);
+    p = loadPuzzle(inFilename);
     if (p == NULL) {
         printf("Error loading puzzle. Exitting.\n");
     }

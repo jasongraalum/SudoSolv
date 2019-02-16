@@ -11,7 +11,6 @@
 
 #include <sudoSolvUtils.h>
 
-
 size_t xlatRowCol(int row, int col, int degree)
 {
     if(row >= 0 &&
@@ -19,7 +18,7 @@ size_t xlatRowCol(int row, int col, int degree)
             col >= 0 &&
             col < degree)
     {
-        return(col*sizeof(Cell)*degree + row*sizeof(Cell));
+        return(degree*degree*col/sizeof(Cell) + row*degree/sizeof(Cell));
     }
     return(-1);
 }
@@ -30,12 +29,12 @@ int setCell(Puzzle *p, int row, int col, Cell v)
     size_t pos = xlatRowCol(row, col, p->degree);
     if(pos >= 0)
     {
-        p->cell[pos] = v;
+        p->cell[pos] = 0x0000 | (1 << v);;
         p->setCount++;
+        return(1);
     }
     else
         return(-1);
-    return(1);
 }
 
 Cell getCell(Puzzle *p, int row, int col)
@@ -44,12 +43,11 @@ Cell getCell(Puzzle *p, int row, int col)
     if(pos >= 0)
     {
         p->getCount++;
-        return(p->cell[xlatRowCol(row,col, p->degree)]);
+        return(log2(p->cell[xlatRowCol(row,col, p->degree)]));
     }
     else
         return(pos);
 }
-
 
 Puzzle * loadPuzzle(char *filename)
 {
@@ -63,8 +61,6 @@ Puzzle * loadPuzzle(char *filename)
     printf("Loading input file: %s\n", filename);
     ifp = fopen(filename,"r");
 
-
-
     if(ifp == NULL) {
         printf("ERROR: Unable to open file: %s\n", filename);
         return(NULL);
@@ -77,8 +73,8 @@ Puzzle * loadPuzzle(char *filename)
         return(NULL);
     }
     
-    if(degree < 2 || degree > 9) {
-        printf("Invalid puzzle degree of %d. The degree must be between 2 and 9.\n", degree);
+    if(degree < 2 || degree > 81) {
+        printf("Invalid puzzle degree of %d. The degree must be between 2 and 81.\n", degree);
         return(NULL);
     }
 
@@ -87,7 +83,7 @@ Puzzle * loadPuzzle(char *filename)
     p->degree = degree;
     p->setCount = count;
     p->getCount = count;
-
+    
     while(ifp)
     {
         if((c = fscanf(ifp, "%d,%d,%d\n", &row, &col, &v)) != 3)
@@ -102,27 +98,6 @@ Puzzle * loadPuzzle(char *filename)
             }
             count += c/3;
             setCell(p, row, col, v);
-        }
-    }
-    return(p);
-
-}
-
-Puzzle * fillPuzzle(int val, int degree)
-{
-    int row, col, v;
-    int c;
-    Puzzle *p;
-
-    p = (Puzzle *)malloc(sizeof(Puzzle));
-    p->cell = (Cell *)malloc(sizeof(Cell)*degree*degree);
-    p->degree = degree;
-    p->setCount = 0;
-    p->getCount = 0;
-
-    for(int row = 0; row < degree; row++) {
-        for(int col = 0; col < degree; col++) {
-            setCell(p, row, col, val);
         }
     }
     return(p);
@@ -156,7 +131,7 @@ int checkPuzzleCol(Puzzle * p, int col)
     for(int row1 = 0; row1 < p->degree-1; row1++) {
         for(int row2 = row1+1; row2 < p->degree; row2++) {
             if(getCell(p, row1, col) == getCell(p, row2, col) && getCell(p, row1, col) != 0) {
-                printf("Column Error at (%d, %d) and (%d, %d)\n", row1, col, row2, col);
+                //printf("Column Error at (%d, %d) and (%d, %d)\n", row1, col, row2, col);
                 return(-1);
             }
         }
@@ -169,7 +144,7 @@ int checkPuzzleRow(Puzzle * p, int row)
     for(int col1 = 0; col1 < p->degree-1; col1++) {
         for(int col2 = col1+1; col2 < p->degree; col2++) {
             if(getCell(p, row, col1) == getCell(p, row, col2) && getCell(p, row, col1) != 0) {
-                printf("Row Error at (%d, %d) and (%d, %d)\n", row, col1, row, col2);
+                //printf("Row Error at (%d, %d) and (%d, %d)\n", row, col1, row, col2);
                 return(-1);
             }
         }
@@ -187,7 +162,7 @@ int checkPuzzleBlock(Puzzle *p, int k, int l)
             int col2 = k*deg_sqrt + (c2 % deg_sqrt);
             int row2 = l*deg_sqrt + (c2 / deg_sqrt);
             if(getCell(p, row1, col1) == getCell(p, row2, col2) && getCell(p, row1, col1) != 0) {
-                printf("Subblock Error at (%d, %d) and (%d, %d)\n", row1, col1, row2, col2);
+                //printf("Subblock Error at (%d, %d) and (%d, %d)\n", row1, col1, row2, col2);
                 return (-1);
             }
         }
