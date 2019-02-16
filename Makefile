@@ -26,6 +26,9 @@ sudoSolv: $(OBJ)
 debug: CFLAGS= -g -I$(IDIR)
 debug: sudoSolv 
 
+perf: CFLAGS= -pg -I$(IDIR)
+perf: sudoSolv 
+
 test: sudoSolv
 test: $(TDIR)/run_test
 

@@ -13,6 +13,7 @@
 
 int treeSolve(Puzzle * p)
 {
+    printPuzzle(p);
     return(addGuess(p, 0, 0));
 }
 
@@ -71,8 +72,8 @@ int addGuess(Puzzle * p, int x, int y)
 int elimSolver(Puzzle * p)
 {
     // Need to fill empty cells with available numbers.
-    for(int row = 0; row < degree; row++) {
-        for(int col = 0; col < degree; col++) {
+    for(int row = 0; row < p->degree; row++) {
+        for(int col = 0; col < p->degree; col++) {
             if(getCell(p, row, col) == 0) {
                 size_t pos = xlatRowCol(row, col, p->degree);
             }

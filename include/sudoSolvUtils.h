@@ -20,14 +20,14 @@
 
 // Each cell can have degree + 1 values - the +1 is for unknown.
 // To simplify - will optimize memory later
-typedef char Cell;
+typedef unsigned int Cell;
 
 // Replace cell with int for now - optimize memory later
 typedef struct Puzzle {
         int degree;
         int setCount;
         int getCount;
-	Cell **cell;
+	Cell *cell;
 } Puzzle;
 
 size_t xlatRowCol(int, int, int);
