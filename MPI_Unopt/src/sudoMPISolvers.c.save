@@ -1,0 +1,71 @@
+// Copyright (c) 2019 Jason Graalum,
+//
+// CS 531 Performance Analysis
+// Portland State University
+// Winter 2019
+//
+// Jason Graalum
+// Feb 2, 2019
+//
+
+#include "sudoMPISolvers.h"
+#include "sudoMPISolvUtils.h"
+
+int treeMPISolve(Puzzle * p, int procId, int numProcs)
+{
+    if(procId == 0) printPuzzle(p);
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    int new_x = 0, new_y = 0;
+    do {
+        new_x = (new_x + 1) % p->degree;
+        new_y = new_x == 0 ? (new_y + 1) : new_y;
+    } while((new_y != p->degree) && getCell(p, new_x, new_y) != 0); 
+    return(new_y == p->degree || addMPIGuess(p, new_x, new_y, procId, numProcs));
+}
+
+int addMPIGuess(Puzzle * p, int x, int y, int procId, int numProcs)
+{
+    int *all_results = malloc(sizeof(int)*p->degree);
+    // If the procId is greater than the degree - we don't need this process
+    if(p->degree > procId)
+    {
+    printf("Proc %d adding guess to %d %d\n",procId, x, y);
+        // Set the cell to the value of the process id + 1 and check if valid solution.
+        // Gather the results from all solutions.
+        // Will send -1 to gather if not valid.
+        setCell(p, x , y, procId+1);
+        int result = verifyPuzzle(p);
+        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Allgather(&result, 1, MPI_INT,all_results, 1, MPI_INT, MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
+        if(procId == 0)
+            for(int i = 0; i < p->degree; i++) printf("%d=%d : ", i, all_results[i]);
+
+        // Now that every process has the full set of results from x, y for all
+        // values, we try each one. First get the next empty x,y
+        int new_x = x, new_y = y;
+        do {
+            new_x = (new_x + 1) % p->degree;
+            new_y = new_x == 0 ? (new_y + 1) : new_y;
+        } while((new_y != p->degree) && getCell(p, new_x, new_y) != 0); 
+
+        // If the new_y is p->degree, we are at the end of the puzzle
+        if(new_y == p->degree) return(1);
+
+        // If not, we have an empty cell
+        // and need to try each successful
+        for(int i = 0; i < p->degree; i++) {
+            if(all_results[i] > 0) {
+                setCell(p, x, y, i+1);
+                if(addMPIGuess(p, new_x, new_y, procId, numProcs))
+                {
+                    return(1);
+                }
+            }
+        }
+        return(0);
+    }
+    return(0);
+}
+
