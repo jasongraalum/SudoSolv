@@ -34,6 +34,7 @@ typedef struct Puzzle {
     int zeroLevel;
     int setCount;
     int getCount;
+    int solCnt;
     struct SolNode * dead_end;
     struct SolNode * solution_head;
     Cell * fixed_cells;
@@ -58,7 +59,7 @@ int checkPuzzleBlock(Puzzle *, Cell *, int, int);
 int verifySolution(Puzzle *, Cell *);
 
 SolNode * createNode(Puzzle *, int);
-SolNode * addNodes(Puzzle *, Cell *, SolNode *, int, int);
+SolNode * addNodes(Puzzle *, Cell *, SolNode *, int);
 int loadSolution(Puzzle *, Cell *);
 int loadStartSolution(Puzzle *, Cell *);
 int exploreSolution(Puzzle *, int);

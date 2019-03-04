@@ -30,7 +30,7 @@ run: sudoSolv $(OBJ)
 	./bin/sudoSolv 1 ../test/puzzle_data/large_expert.pz
 
 small: sudoSolv $(OBJ)
-	./bin/sudoSolv 1 ../test/puzzle_data/test_4_gap.pz
+	./bin/sudoSolv 1 ../test/puzzle_data/test_1_gap.pz
 
 val: sudoSolv $(OBJ)
 	valgrind --leak-check=full ./bin/sudoSolv 1 ../test/puzzle_data/test_4_gap.pz
