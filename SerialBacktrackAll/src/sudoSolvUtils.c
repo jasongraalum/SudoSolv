@@ -45,6 +45,7 @@ Puzzle * loadPuzzle(char *filename)
     p->degree = degree;
     p->setCount = count;
     p->getCount = count;
+    p->solCnt = 0;
     p->zeroLevel = degree*degree;
 
     p->fixed_cells = (Cell *)malloc(sizeof(Cell)*degree*degree);
@@ -206,7 +207,7 @@ SolNode * createNode(Puzzle *p, int pos)
 }
 
 // If ex is set this is an exclusive node and if not zero, all other values are dead-ends
-SolNode * addNodes(Puzzle *p, Cell * s, SolNode *node, int pos, int ex)
+SolNode * addNodes(Puzzle *p, Cell * s, SolNode *node, int pos)
 {
     unsigned int row = pos / p->degree;
     unsigned int col = pos - row*p->degree;
@@ -222,8 +223,14 @@ SolNode * addNodes(Puzzle *p, Cell * s, SolNode *node, int pos, int ex)
         p->solution_head = createNode(p, pos);
         p->zeroLevel = p->degree*p->degree;
         node = p->solution_head;
+        if(p->fixed_cells[pos] != 0) {
+            for(unsigned int i = 0; i < p->degree+1; i++)
+                if(i != val) node->next_cells[i] = p->dead_end;
+        }
+        else p->zeroLevel = 0;
     }
 
+    
     // Invalid solution branch
     if(node->next_cells[val] == p->dead_end)
         return(p->dead_end);
@@ -231,19 +238,19 @@ SolNode * addNodes(Puzzle *p, Cell * s, SolNode *node, int pos, int ex)
     else if(node->next_cells[val] == NULL) {
         node->next_cells[val] = createNode(p, pos+1);
         // If this is an exclusive node, block all other values.
-        if(ex == 1 && val != 0) {
-            for(unsigned int i = 0; i < p->degree; i++)
+        if(p->fixed_cells[pos] != 0) {
+            for(unsigned int i = 0; i < p->degree+1; i++)
                 if(i != val) node->next_cells[i] = p->dead_end;
         }
         else if (p->zeroLevel > pos) p->zeroLevel = pos;
     }
 
-    return(addNodes(p, s, node->next_cells[val], ++pos, ex));  
+    return(addNodes(p, s, node->next_cells[val], ++pos));  
 }
 
 int loadStartSolution(Puzzle * p, Cell * s)
 {
-    if(addNodes(p, s, p->solution_head, 0, 1) == NULL)
+    if(addNodes(p, s, p->solution_head, 0) == NULL)
         return(1);
     else
         return(-1);
@@ -251,7 +258,7 @@ int loadStartSolution(Puzzle * p, Cell * s)
 
 int loadSolution(Puzzle * p, Cell * s)
 {
-    if(addNodes(p, s, p->solution_head, 0, 0) == NULL)
+    if(addNodes(p, s, p->solution_head, 0) == NULL)
         return(1);
     else
         return(-1);
