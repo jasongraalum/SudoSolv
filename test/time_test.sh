@@ -10,7 +10,8 @@
 #//
 
 BINDIR=`pwd`"/bin"
-echo $BINDIR
+
+
 
 
 
