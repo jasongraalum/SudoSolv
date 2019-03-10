@@ -11,7 +11,7 @@
 #include "sudoSolvers.h"
 #include "sudoSolvUtils.h"
 
-int btAllSolve(Puzzle * p, int numProcs)
+int btAllSolver(Puzzle * p, int numProcs)
 {
     printPuzzle(p);
     if(verifySolution(p, p->fixed_cells) <0) return(-1);
