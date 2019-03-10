@@ -1,0 +1,303 @@
+clang -c -o obj/sudoSolvers.o src/sudoSolvers.c -g -I./include 
+clang -o ./bin/sudoSolv obj/sudoSolv.o obj/sudoSolvUtils.o obj/sudoSolvers.o obj/sudoSolverMPI.o -g -I./include -lm 
+./bin/sudoSolv 1 ../test/puzzle_data/test_15_gap.pz
+Repeats: 1
+Input file: ../test/puzzle_data/test_15_gap.pz
+Loading input file: ../test/puzzle_data/test_15_gap.pz
+############
+Degree = 4	zeroDepth = 16	setCount = 0	getCount = 0
+############
+  -  -  -  -
+  -  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+############
+index = 1	solution[index] = 0
+0:1 1:0 2:0 3:0 4:0 
+0:1 1:0 2:0 3:0 4:0 
+Found new solution:1
+  1  3  2  4
+  2  4  1  3
+  3  2  4  1
+  4  1  3  2
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 1
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:1 4:0 
+Disqualified solution
+  1  1  -  -
+  -  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 0
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:1 4:0 
+Found new solution:2
+  1  2  3  4
+  3  4  1  2
+  2  3  4  1
+  4  1  2  3
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:1 4:0 
+Disqualified solution
+  1  2  1  -
+  -  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:1 4:0 
+Disqualified solution
+  1  2  2  -
+  -  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  1
+  -  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  2
+  -  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 3	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:-1 3:0 4:1 
+Disqualified solution
+  1  2  3  3
+  -  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:1 4:0 
+Disqualified solution
+  1  2  3  4
+  1  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:1 4:0 
+Disqualified solution
+  1  2  3  4
+  2  -  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  1  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  2  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 3	solution[index] = 4
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:-1 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  3  -  -
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:1 3:0 4:0 
+Disqualified solution
+  1  2  3  4
+  3  4  1  1
+  -  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:1 3:0 4:0 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  1  -  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:1 4:0 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  1  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:1 4:0 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  2  -  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  1  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  2  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 3	solution[index] = 4
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:-1 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  3  1
+  -  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  4  1
+  1  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  4  1
+  2  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 3	solution[index] = 4
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:-1 3:0 4:1 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  4  1
+  3  -  -  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:1 3:0 4:0 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  4  1
+  4  1  1  -
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 1	solution[index] = 2
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:0 2:0 3:1 4:0 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  4  1
+  4  1  2  1
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+index = 2	solution[index] = 3
+0:1 1:1 2:0 3:0 4:0 
+0:0 1:-1 2:0 3:1 4:0 
+Disqualified solution
+  1  2  3  4
+  3  4  1  2
+  2  3  4  1
+  4  1  2  2
+
+0:1 1:1 2:0 3:0 4:0 
+*****************
+0,	0,	0,	0,	1270513.000000
+Total time: 1519626.000000
