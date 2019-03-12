@@ -63,7 +63,7 @@ Puzzle * loadPuzzle(char *filename)
     Puzzle *p;
     FILE *ifp;
 
-    printf("Loading input file: %s\n", filename);
+    //printf("Loading input file: %s\n", filename);
     ifp = fopen(filename,"r");
 
     if(ifp == NULL) {

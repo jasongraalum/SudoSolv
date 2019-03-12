@@ -96,7 +96,7 @@ int main(int argc, char **argv)
             if (p == NULL) {
                 printf("Error loading puzzle. Exitting.\n");
             }
-            printPuzzle(p);
+            //printPuzzle(p);
         }
 
         clock_gettime(CLOCK_REALTIME, &ts_realtime_start);

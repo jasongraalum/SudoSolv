@@ -13,7 +13,7 @@
 
 int btSolve(Puzzle * p)
 {
-    printPuzzle(p);
+    //printPuzzle(p);
     return(addGuess(p, 0, 0));
 }
 

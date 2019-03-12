@@ -41,11 +41,11 @@ int btMPISolve(Puzzle * p, int row, int col, int numProcs, int procId)
     MPI_Allgather(proc_res,1,MPI_INT,all_results,1,MPI_INT, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    if(procId == 0) {
+    //if(procId == 0) {
     //for(int i = 0; i < numProcs; i++)
     //    printf("%d_",all_results[i]);
     //printf("\n");
-    }
+    //}
 
     // Pick first passing result
     for(int i = 0; i < numProcs; i++)
