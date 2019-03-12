@@ -25,7 +25,6 @@
 typedef struct trial {
     int pos;
     int index;
-    int degree;
     SolNode * sn;
     Cell * solution;
 } trial_t;
