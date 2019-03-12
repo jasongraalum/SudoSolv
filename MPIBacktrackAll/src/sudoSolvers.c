@@ -1,5 +1,4 @@
-// Copyright (c) 2019 Jason Graalum,
-//
+// Copyright (c) 2019 Jason Graalum, //
 // CS 531 Performance Analysis
 // Portland State University
 // Winter 2019
@@ -14,12 +13,20 @@
 int btAllSolver(Puzzle * p, int numProcs)
 {
     int degree = p->degree;
+    int solCount = 0;
+    int busyProcs = 0;
+    int noMore = 0;
+
+    trial_t * nextTry = NULL;
+    solEntry_t ** procCurrentTry = (solEntry_t **)calloc(numProcs, sizeof(solEntry_t *));
+
     procFreeQ_head_t procFreeQ_head;
     TAILQ_INIT(&procFreeQ_head);
 
     solQ_head_t solQ_head;
     TAILQ_INIT(&solQ_head);
 
+    // Initial free process queue
     for(int i = 1; i < numProcs; i++) {
         struct procEntry * newProc = malloc(sizeof(struct procEntry));
         newProc->procId = i;
@@ -42,55 +49,57 @@ int btAllSolver(Puzzle * p, int numProcs)
     Cell * solution = (Cell *)malloc(sizeof(Cell)*degree*degree);
     memcpy(solution, p->fixed_cells, sizeof(Cell)*degree*degree);
     int result = btSolve(degree, solution);
+    free(solution);
 
     // Build n possible solution options(based on number of processes)
     // by finding the first n NULL pointers
-    int pos = 0;
     procEntry_t * nextProc;
-    Cell * newsol = (Cell *)malloc(sizeof(Cell)*degree*degree);
-    solEntry_t * newSol = malloc(sizeof(struct solEntry));
-
-    trial_t * nextTry;
-    int solCount = 0;
-    trial_t ** procCurrentTry = (trial_t **)calloc(numProcs, sizeof(trial_t *));
-    int busyProcs = 0;
+    
     do {
-        // Start with fixed cells
-        memcpy(newsol, p->fixed_cells, sizeof(Cell)*degree*degree);
-        // Get next possible solution
-        nextTry = getNextSolution(p, p->solution_head, newsol, 0);
+        // Add next possible solution to the solution queue
+        if(noMore == 0) {
+            // Start with fixed cells
+            Cell * new_solution = (Cell *)malloc(sizeof(Cell)*degree*degree);
+            memcpy(new_solution, p->fixed_cells, sizeof(Cell)*degree*degree);
 
-        // If a valid solution(not a dead_end), insert into solution queue
-        if(nextTry->sn != NULL && nextTry->sn != p->dead_end)
-        {
-            newSol->trial = nextTry;
-            solCount++;
-            TAILQ_INSERT_TAIL(&solQ_head, newSol, entries);
+            // Get next possible solution
+            nextTry = getNextSolution(p, p->solution_head, new_solution, 0);
+
+            // If a valid solution(not a dead_end), insert into solution queue
+            if(nextTry->sn != NULL && nextTry->sn != p->dead_end)
+            {
+                solEntry_t * newSol = malloc(sizeof(struct solEntry));
+                newSol->trial = nextTry;
+                solCount++;
+                TAILQ_INSERT_TAIL(&solQ_head, newSol, entries);
+            }
         }
 
-        // WHile there are open processors and solutions on the queue
+        // While there are open processors and solutions on the queue
         // Send them out.
         while(!TAILQ_EMPTY(&procFreeQ_head) && !TAILQ_EMPTY(&solQ_head))  {
+            // Get the next available process
             nextProc = TAILQ_FIRST(&procFreeQ_head);
             TAILQ_REMOVE(&procFreeQ_head, nextProc, entries);
 
-            newSol = TAILQ_FIRST(&solQ_head);
+            // Get the next trial solution
+            solEntry_t * newSol = TAILQ_FIRST(&solQ_head);
             TAILQ_REMOVE(&solQ_head, newSol, entries);
 
-            // Do a simple MPI_Send here to test
-            //printf("Sending to proc %d\n", nextProc->procId);
-            MPI_Send((void*)(&(newSol->trial->degree)), 
+            // Send the degree of the puzzle
+            MPI_Send(&degree, 
                     1, 
                     MPI_INT, 
                     nextProc->procId, 
                     0, 
                     MPI_COMM_WORLD);
 
-            Cell * solution = newSol->trial->solution;
-
-            procCurrentTry[nextProc->procId] = newSol->trial;
+            //Save off trial details in case it is a failure.
+            procCurrentTry[nextProc->procId] = newSol;
             busyProcs++;
-            MPI_Send(solution, 
+
+            // Send solution
+            MPI_Send(newSol->trial->solution, 
                     degree, 
                     mpiCell, 
                     nextProc->procId, 
@@ -103,35 +112,39 @@ int btAllSolver(Puzzle * p, int numProcs)
 
             // Wait for a recv from any the then requeue that proc
             // status var is needed to get the sending procId
+            //int result = btSolve(degree, nextTry->solution);
             MPI_Status status;
-            int result;
-            MPI_Recv(&result, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+            Cell * sol = (Cell *)malloc(sizeof(Cell)*(degree*degree+1));
+
+            MPI_Recv(sol, degree*degree+1, mpiCell, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+
             int sendingProc = status.MPI_SOURCE;
 
-            // Add the sending proc back onto the process queue
-            //int result = btSolve(degree, nextTry->solution);
-
-            if(result > 0) {
-                Cell * goodSol = (Cell *)malloc(sizeof(Cell)*degree*degree);
-                MPI_Recv(goodSol, degree*degree, mpiCell, sendingProc, 0, MPI_COMM_WORLD, &status);
+            if(sol[0] > 0) {
                 p->solCnt++;
-                printf("Found new solution:%d\n",p->solCnt);
-                printSolution(p, goodSol);
-                loadSolution(p, goodSol);
+                printf("Received good solution:%d\n",p->solCnt);
+                printSolution(p, sol+1);
+                loadSolution(p, sol+1);
             }
             else
             {
-                Cell * badSol = (Cell *)malloc(sizeof(Cell)*degree*degree);
-                MPI_Recv(badSol, degree*degree, mpiCell, sendingProc, 0, MPI_COMM_WORLD, &status);
-                int index = procCurrentTry[sendingProc]->index;
-                procCurrentTry[sendingProc]->sn->next_cells[index] = p->dead_end;
+                printf("Received bad solution\n");
+                int index = procCurrentTry[sendingProc]->trial->index;
+                procCurrentTry[sendingProc]->trial->sn->next_cells[index] = p->dead_end;
             }
+            free(procCurrentTry[sendingProc]->trial->solution);
+            free(procCurrentTry[sendingProc]->trial);
+            free(procCurrentTry[sendingProc]); 
             procCurrentTry[sendingProc] = NULL;
+
             nextProc->procId = status.MPI_SOURCE;
             TAILQ_INSERT_TAIL(&procFreeQ_head, nextProc, entries);
-
+            busyProcs--;
         }
-    } while(nextTry->sn != NULL); 
+        if(nextTry->sn == NULL) noMore=1;
+
+    } while(nextTry->sn != NULL || busyProcs > 0); 
+
     printf("Solution trial count = %d\n", solCount);
     int termSignal = -1;
     MPI_Send((void*)&termSignal, 
@@ -140,9 +153,6 @@ int btAllSolver(Puzzle * p, int numProcs)
             nextProc->procId, 
             0, 
             MPI_COMM_WORLD);
-
-    free(newsol);
-    free(solution);
 
     return(0);
 }

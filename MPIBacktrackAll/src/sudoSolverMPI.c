@@ -68,24 +68,22 @@ int mpiSolver(int procId)
 {
     int degree;
     int *result = (int *)malloc(sizeof(int));
-    *result = 0;
     Cell * soln;
     MPI_Status status;
     do {
         //printf("Waiting for rec:%d\n",procId); 
         MPI_Recv(&degree, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
-        printf("Received degree: %d\n", degree); 
+        //printf("Received degree: %d\n", degree); 
         if(degree > 0) {
             //printf("Waiting for solution to try\n");
-            soln = (Cell *)malloc(sizeof(Cell) * degree * degree);
-            MPI_Recv(soln, degree*degree, mpiCell, 0, 0, MPI_COMM_WORLD, &status);
-            //printf("Received solution to try\n");
-            //printf("soln[0] = %d\n",soln[0]);
-            *result = btSolve(degree, soln);
-            printf("Result(%d): %d\n", procId, *result);
-            MPI_Send(result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-            if(*result == 1)
-                MPI_Send(soln, degree*degree, mpiCell, 0, 0, MPI_COMM_WORLD);
+            soln = (Cell *)malloc(sizeof(Cell) * (degree * degree + 1));
+            MPI_Recv(soln+1, degree*degree, mpiCell, 0, 0, MPI_COMM_WORLD, &status);
+            printf("Received solution to try:");
+            for(int i = 0; i < degree*degree;i++) printf("%d ", soln[i+1]);
+            printf("\n");
+            soln[0] = btSolve(degree, soln+1);
+            printf("Result(%d): %d\n", procId, soln[0]);
+            MPI_Send(soln, (degree*degree+1), mpiCell, 0, 0, MPI_COMM_WORLD);
         }
     }
     while(degree != -1);
