@@ -8,7 +8,7 @@ LDIR=lib
 
 OMPI_CC=clang
 CC=mpicc
-MPI_EX=mpirun --map-by ppr:4:node -n 12 -hostfile mpi_hosts
+MPI_EX=mpirun --map-by node -n 24 -hostfile mpi_hosts
 DEFINES=
 CFLAGS= -g -I$(IDIR)
 
@@ -27,7 +27,10 @@ mpi_loop: $(OBJ)
 	$(CC) -o $(BDIR)/$@ $(OBJ) $(CFLAGS) $(LIBS) $(DEFINES)
 
 run: mpi_loop $(OBJ)
-	$(MPI_EX) ./mpi_loop 100000 1000 ../test/puzzle_data/large_expert.pz
+	$(MPI_EX) ./mpi_loop 1000000 100 ../test/puzzle_data/large_expert.pz
+
+runblock: mpi_loop $(OBJ)
+	$(MPI_EX) ./mpi_loop 1000000 100 0 ../test/puzzle_data/large_expert.pz
 
 clean:
 	rm -f $(ODIR)/*.o *~ $(BDIR)/mpi_loop core $(INCDIR)/*~ 

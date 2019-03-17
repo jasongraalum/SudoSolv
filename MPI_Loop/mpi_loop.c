@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <mpi.h>
 
 int main(int argc, char ** argv)
@@ -24,6 +25,11 @@ int main(int argc, char ** argv)
 
     int payload_size = atoi(argv[1]);
     int msg_count = atoi(argv[2]);
+    int block;
+    if(argc > 2)
+        block = atoi(argv[3]);
+    else
+        block = 1;
 
     int *payload = (int *) malloc(sizeof(int)*payload_size);
 
@@ -41,10 +47,14 @@ int main(int argc, char ** argv)
     
     payload[0] = msg_count;
 
+    MPI_Request req = MPI_REQUEST_NULL;
     if(procId == 0) {
         // First to send
         // Send to 1
-        MPI_Send(payload, payload_size, MPI_INT, destId, 0, MPI_COMM_WORLD);
+        if(block == 1)
+            MPI_Send(payload, payload_size, MPI_INT, destId, 0, MPI_COMM_WORLD);
+        else
+            MPI_Isend(payload, payload_size, MPI_INT, destId, 0, MPI_COMM_WORLD, &req);
     }
 
     do {
@@ -53,6 +63,7 @@ int main(int argc, char ** argv)
         start_recv = MPI_Wtime();
         MPI_Recv(payload, payload_size, MPI_INT, srcId, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         end_recv = MPI_Wtime();
+        printf("R, %d, %d, %lf\n", procId, srcId, end_recv-start_recv);
 
         //printf("%d\n", payload[0]);
         payload[0]--;
@@ -62,13 +73,17 @@ int main(int argc, char ** argv)
         if(payload[0] > 0)
         {
             start_send = MPI_Wtime();
-            MPI_Send(payload, payload_size, MPI_INT, destId, 0, MPI_COMM_WORLD);
+            if(block == 1)
+                MPI_Send(payload, payload_size, MPI_INT, destId, 0, MPI_COMM_WORLD);
+            else
+                MPI_Isend(payload, payload_size, MPI_INT, destId, 0, MPI_COMM_WORLD, &req);
             end_send = MPI_Wtime();
+            printf("S, %d, %d, %lf\n", procId, destId, end_send-start_send);
         }
     } while(payload[0] >= numProcs);
 
     MPI_Barrier(MPI_COMM_WORLD);
-    printf("%d\n", procId);
+    //printf("%d\n", procId);
     
     MPI_Finalize();
     return(0);
