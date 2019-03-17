@@ -13,19 +13,13 @@
 
 int btSolve(Puzzle * p)
 {
-    //printPuzzle(p);
     return(addGuess(p, 0, 0));
 }
 
 int addGuess(Puzzle * p, int x, int y)
 {
-    //printPuzzle(p);
-    //printf("\n\n\n");
-    //printf("\nChecking %d, %d\t", x, y);
-
     // If cell already has a value
     if(getCell(p, x, y) != 0) {
-//        printf("set value : %d\n", getCell(p, x, y));
         int new_x, new_y;
         new_x = (x + 1) % p->degree;
         new_y = new_x == 0 ? (y + 1) : y;
@@ -40,7 +34,6 @@ int addGuess(Puzzle * p, int x, int y)
 
     Cell guess_val = 1;
     do {
-        //printf("Trying %d at %d, %ld\n", guess_val, x, y);
         // Try a number
         setCell(p, x, y, guess_val);
 
@@ -58,32 +51,11 @@ int addGuess(Puzzle * p, int x, int y)
             if(addGuess(p, new_x, new_y) > 0) 
                 return(1);
         }
-//        printf("Incrementing guess\n");
         guess_val++;
         if(guess_val > p->degree) { 
-         //   printf("X(%d, %d) %ld ", x, y, guess_val);
             setCell(p, x, y, 0);
             return(-1);
         }
     } while(1);
-}
-
-int elimSolver(Puzzle * p)
-{
-    // Need to fill empty cells with available numbers.
-    for(int row = 0; row < p->degree; row++) {
-        for(int col = 0; col < p->degree; col++) {
-            if(getCell(p, row, col) == 0) {
-                size_t pos = xlatRowCol(row, col, p->degree);
-            }
-        }
-    }
-
-    return(1);
-}
-
-int updateEmilPs(Puzzle *p, Puzzle ** ePs)
-{
-    return(0);
 }
 

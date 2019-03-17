@@ -141,7 +141,7 @@ int main(int argc, char **argv)
         }
 
         printf("Total time: %lf\n", (double)(1e9*(ts_totaltime_end.tv_sec-ts_totaltime_start.tv_sec)+(ts_totaltime_end.tv_nsec-ts_totaltime_start.tv_nsec)));
-        printPuzzle(p);
+        //printPuzzle(p);
     }
     free(p->cell);
     free(p);
